@@ -1,15 +1,18 @@
 package de.tudo.etaroutinggateway.services
 
-import de.tudo.etaroutinggateway.entities.RoutingRequest
 import de.tudo.etaroutinggateway.entities.VehicleType
 import de.tudo.etaroutinggateway.entities.dtos.MetadataDto
 import de.tudo.etaroutinggateway.entities.dtos.RouteLocationDto
 import de.tudo.etaroutinggateway.entities.dtos.RoutingRequestDto
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class RoutingRequestGeneratorService {
+class RoutingRequestGeneratorService(
+    @Autowired
+    private val kafkaService: KafkaService
+) {
 
     fun generateRoutingRequest(numLocations: Int = 2,
                                vehicleType: VehicleType = VehicleType.CAR): RoutingRequestDto {
@@ -30,6 +33,8 @@ class RoutingRequestGeneratorService {
 
     fun sendGeneratedRoutingRequest(routingRequest: RoutingRequestDto) {
         println("RoutingRequestGeneratorService: Sending routing request: $routingRequest")
+        kafkaService.sendRoutingRequest(routingRequest)
+
     }
 
     fun generateAndSendRoutingRequest(): RoutingRequestDto {
