@@ -14,7 +14,7 @@ class RoutingRequestGeneratorService(
     @Autowired
     private val kafkaService: KafkaService,
     @Autowired
-    private val otpRoutMappingService: OtpRouteMappingService
+    private val otpRouteMappingService: OtpRouteMappingService
 ) {
 
     fun generateRoutingRequest(numLocations: Int = 2,
@@ -23,8 +23,8 @@ class RoutingRequestGeneratorService(
             requestId = UUID.randomUUID(),
             routeLocations = (0..numLocations).map {
                 RouteLocationDto(
-                    latitude = 49.434114 + Math.random() * (52.866945-49.434114),//51.1642292,
-                    longitude = 7.29526 + Math.random() * (11.676014-7.29526),//10.4541194,
+                    latitude = 52.45936 + Math.random() * (53.36039-52.45936), //49.434114 + Math.random() * (52.866945-49.434114),//51.1642292,
+                    longitude = 8.36609 + Math.random() * (10.05249-8.36609), //7.29526 + Math.random() * (11.676014-7.29526),//10.4541194,
                     waitingTime = (Math.random() * 100.0).toInt()
                 )
             }.toList(),
@@ -47,6 +47,6 @@ class RoutingRequestGeneratorService(
     }
 
     fun generateAndSendOtpRoutingRequest(): RoutingResponseDto {
-        return otpRoutMappingService.getRouteForRequest(generateRoutingRequest())
+        return otpRouteMappingService.getRouteForRequest(generateRoutingRequest())
     }
 }

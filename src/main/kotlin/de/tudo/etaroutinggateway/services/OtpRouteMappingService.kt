@@ -1,5 +1,7 @@
 package de.tudo.etaroutinggateway.services
 
+import de.tudo.etaroutinggateway.entities.VehicleType
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RouteLocationDto
 import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingRequestDto
 import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingResponseDto
 import de.tudo.etaroutinggateway.entities.dtos.otp.OtpResponseDto
@@ -21,7 +23,8 @@ class OtpRouteMappingService(
     private val otpServerAddress: String? = null
 
     fun getRouteForRequest(routingRequest: RoutingRequestDto): RoutingResponseDto {
-        this.httpRouteRequest()
+        val response = this.getRouteForStartEnd(routingRequest.routeLocations[0], routingRequest.routeLocations[1], routingRequest.metadata.vehicleType)
+        print(response)
         return RoutingResponseDto()
     }
 
@@ -29,11 +32,11 @@ class OtpRouteMappingService(
         kafkaService.sendRoutingResponse(getRouteForRequest(routingRequestDto!!))
     }
 
-    fun httpRouteRequest() {
-        val requestUrl = "/otp/routers/default/plan?fromPlace=52.40912125231122,9.514160156250002&toPlace=52.98833725339543,9.937133789062502&time=4:12pm&date=01-23-2024&mode=CAR&arriveBy=false&wheelchair=false&showIntermediateStops=true&locale=en"
-
-        print(restTemplate.getForObject(otpServerAddress + requestUrl, String::class.java))
+    fun getRouteForStartEnd(start: RouteLocationDto, end: RouteLocationDto, mode: VehicleType): OtpResponseDto {
+        val requestUrl = "/otp/routers/default/plan?fromPlace=${start.latitude},${start.longitude}" +
+                "&toPlace=${end.latitude},${end.longitude}&time=4:12pm&date=01-23-2024&mode=$mode&arriveBy=false" +
+                "&wheelchair=false&showIntermediateStops=true&locale=en"
         val routingResponse: OtpResponseDto? = restTemplate.getForObject(otpServerAddress + requestUrl, OtpResponseDto::class.java)
-        print(routingResponse)
+        return routingResponse!!
     }
 }
