@@ -1,4 +1,4 @@
-package de.tudo.etaroutinggateway.entities.dtos
+package de.tudo.etaroutinggateway.entities.dtos.gaiax
 
 import java.util.*
 

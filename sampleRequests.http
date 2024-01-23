@@ -1,1 +1,6 @@
-GET http://localhost:8080/sample/generate
+GET http://localhost:8081/sample/otpsamplerequest
+Accept: application/json
+
+###
+GET http://localhost:8081/sample/generate
+Accept: application/json

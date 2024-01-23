@@ -1,11 +1,11 @@
 package de.tudo.etaroutinggateway.controllers
 
-import de.tudo.etaroutinggateway.entities.dtos.RoutingRequestDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingRequestDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingResponseDto
 import de.tudo.etaroutinggateway.services.RoutingRequestGeneratorService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -17,6 +17,11 @@ class SampleController(
 
     @GetMapping("/generate")
     fun generateRandomRequest(): RoutingRequestDto {
-        return routingRequestGeneratorService.generateAndSendRoutingRequest()
+        return routingRequestGeneratorService.generateAndSendKafkaRoutingRequest()
+    }
+
+    @GetMapping("/otpsamplerequest")
+    fun sampleOtpRoutingRequest(): RoutingResponseDto {
+        return routingRequestGeneratorService.generateAndSendOtpRoutingRequest()
     }
 }

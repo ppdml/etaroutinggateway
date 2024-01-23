@@ -1,4 +1,4 @@
-package de.tudo.etaroutinggateway.entities.dtos
+package de.tudo.etaroutinggateway.entities.dtos.gaiax
 
 class RouteLocationDto(
     val latitude: Double,

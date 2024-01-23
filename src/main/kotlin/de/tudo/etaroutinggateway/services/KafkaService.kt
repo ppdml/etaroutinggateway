@@ -1,7 +1,7 @@
 package de.tudo.etaroutinggateway.services
 
-import de.tudo.etaroutinggateway.entities.dtos.RoutingRequestDto
-import de.tudo.etaroutinggateway.entities.dtos.RoutingResponseDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingRequestDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingResponseDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate

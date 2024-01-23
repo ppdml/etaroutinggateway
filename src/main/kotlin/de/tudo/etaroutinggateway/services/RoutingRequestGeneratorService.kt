@@ -1,9 +1,10 @@
 package de.tudo.etaroutinggateway.services
 
 import de.tudo.etaroutinggateway.entities.VehicleType
-import de.tudo.etaroutinggateway.entities.dtos.MetadataDto
-import de.tudo.etaroutinggateway.entities.dtos.RouteLocationDto
-import de.tudo.etaroutinggateway.entities.dtos.RoutingRequestDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.MetadataDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RouteLocationDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingRequestDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingResponseDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
@@ -11,7 +12,9 @@ import java.util.*
 @Service
 class RoutingRequestGeneratorService(
     @Autowired
-    private val kafkaService: KafkaService
+    private val kafkaService: KafkaService,
+    @Autowired
+    private val otpRoutMappingService: OtpRouteMappingService
 ) {
 
     fun generateRoutingRequest(numLocations: Int = 2,
@@ -31,15 +34,19 @@ class RoutingRequestGeneratorService(
         )
     }
 
-    fun sendGeneratedRoutingRequest(routingRequest: RoutingRequestDto) {
+    fun sendKafkaGeneratedRoutingRequest(routingRequest: RoutingRequestDto) {
         println("RoutingRequestGeneratorService: Sending routing request: $routingRequest")
         kafkaService.sendRoutingRequest(routingRequest)
 
     }
 
-    fun generateAndSendRoutingRequest(): RoutingRequestDto {
+    fun generateAndSendKafkaRoutingRequest(): RoutingRequestDto {
         val routingRequest = generateRoutingRequest()
-        sendGeneratedRoutingRequest(routingRequest)
+        sendKafkaGeneratedRoutingRequest(routingRequest)
         return routingRequest
+    }
+
+    fun generateAndSendOtpRoutingRequest(): RoutingResponseDto {
+        return otpRoutMappingService.getRouteForRequest(generateRoutingRequest())
     }
 }

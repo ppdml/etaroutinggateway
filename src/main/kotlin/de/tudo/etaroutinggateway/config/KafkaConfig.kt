@@ -1,7 +1,7 @@
 package de.tudo.etaroutinggateway.config
 
-import de.tudo.etaroutinggateway.entities.dtos.RoutingRequestDto
-import de.tudo.etaroutinggateway.entities.dtos.RoutingResponseDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingRequestDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingResponseDto
 import org.apache.kafka.clients.admin.AdminClientConfig
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
