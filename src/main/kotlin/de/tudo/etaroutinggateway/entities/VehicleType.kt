@@ -1,6 +1,8 @@
 package de.tudo.etaroutinggateway.entities
 
-enum class VehicleType(val type: String) {
-    CAR("car"),
-    TRUCK("truck"),
+import com.fasterxml.jackson.annotation.JsonValue
+
+enum class VehicleType(@JsonValue val type: String) {
+    CAR("CAR"),
+    TRUCK("TRUCK"),
 }

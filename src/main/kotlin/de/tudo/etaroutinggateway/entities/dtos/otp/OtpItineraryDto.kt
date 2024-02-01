@@ -1,6 +1,8 @@
 package de.tudo.etaroutinggateway.entities.dtos.otp
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingFeatureDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingGeometryDto
 import java.util.*
 
 data class OtpItineraryDto(
@@ -23,5 +25,9 @@ data class OtpItineraryDto(
     val tooSloped: Boolean,
     val arrivedAtDestinationWithRentedBicycle: Boolean,
 ) {
+    fun toGaiaxRoutingFeatureDto(): RoutingFeatureDto {
+        val routingFeature = RoutingFeatureDto(geometry = legs[0].toGaiaxRoutingGeometryDto())
+        return routingFeature
+    }
 
 }

@@ -1,6 +1,7 @@
 package de.tudo.etaroutinggateway.entities.dtos.otp
 
 import de.tudo.etaroutinggateway.entities.VehicleType
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingGeometryDto
 
 data class OtpLegDto(
     val startTime: Long,
@@ -24,5 +25,12 @@ data class OtpLegDto(
     val walkingBike: Boolean,
     val duration: Long,
 ) {
+    fun toGaiaxRoutingGeometryDto(): RoutingGeometryDto {
+        val routingGeometry = RoutingGeometryDto()
+        routingGeometry.coordinates = steps.map { point ->
+            listOf(point.lon, point.lat)
+        }.toList()
+        return routingGeometry
+    }
 
 }

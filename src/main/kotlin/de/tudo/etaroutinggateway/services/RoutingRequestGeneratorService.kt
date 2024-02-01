@@ -17,7 +17,7 @@ class RoutingRequestGeneratorService(
     private val otpRouteMappingService: OtpRouteMappingService
 ) {
 
-    fun generateRoutingRequest(numLocations: Int = 2,
+    fun generateRoutingRequest(numLocations: Int = 3,
                                vehicleType: VehicleType = VehicleType.CAR): RoutingRequestDto {
         return RoutingRequestDto(
             requestId = UUID.randomUUID(),

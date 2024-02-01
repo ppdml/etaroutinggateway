@@ -36,7 +36,11 @@ class KafkaConfig(
     @Bean
     fun routingRequestDtoKafkaConsumerFactory(): ConsumerFactory<String, RoutingRequestDto> {
         val payloadJsonDeserializer: JsonDeserializer<RoutingRequestDto> = JsonDeserializer<RoutingRequestDto>()
-        payloadJsonDeserializer.addTrustedPackages("de.tudo.etaroutinggateway.entities.dtos")
+        payloadJsonDeserializer.addTrustedPackages(
+            "de.tudo.etaroutinggateway.entities.dtos",
+            "de.tudo.etaroutinggateway.entities.dtos.gaiax",
+            "de.tudo.etaroutinggateway.entities.dtos.otp"
+        )
         return DefaultKafkaConsumerFactory(jsonConsumerConfigs(), StringDeserializer(), payloadJsonDeserializer)
     }
 
