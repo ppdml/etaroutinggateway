@@ -23,8 +23,6 @@ class KafkaService(
     }
 
     fun sendRoutingResponse(routingResponse: RoutingResponseDto) {
-        print(responseTopic)
-        print(routingResponse)
         kafkaResponseTemplate.send(responseTopic, routingResponse)
     }
 }

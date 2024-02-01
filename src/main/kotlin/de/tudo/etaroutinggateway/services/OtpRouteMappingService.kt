@@ -1,10 +1,7 @@
 package de.tudo.etaroutinggateway.services
 
 import de.tudo.etaroutinggateway.entities.VehicleType
-import de.tudo.etaroutinggateway.entities.dtos.gaiax.RouteLocationDto
-import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingFeatureDto
-import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingRequestDto
-import de.tudo.etaroutinggateway.entities.dtos.gaiax.RoutingResponseDto
+import de.tudo.etaroutinggateway.entities.dtos.gaiax.*
 import de.tudo.etaroutinggateway.entities.dtos.otp.OtpResponseDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -25,23 +22,19 @@ class OtpRouteMappingService(
 
     fun getRouteForRequest(routingRequest: RoutingRequestDto): RoutingResponseDto {
         if (routingRequest.routeLocations.size < 2) throw Exception("Two locations are required for routing")
-        var responses = ArrayList<RoutingResponseDto>()
+        var responses = ArrayList<RoutingFeatureDto>()
         for (i in 0..routingRequest.routeLocations.size - 2) {
-            responses.add(this.getGaiaXRouteForStartAndEnd(routingRequest.routeLocations[i],
+            responses.addAll(this.getGaiaXRouteForStartAndEnd(routingRequest.routeLocations[i],
                 routingRequest.routeLocations[i + 1],
                 routingRequest.metadata.vehicleType))
         }
-        val features = ArrayList<RoutingFeatureDto>()
-        for (response in responses) {
-            features.addAll(response.features)
-        }
-        return RoutingResponseDto(features = features)
+        return RoutingResponseDto(features = responses)
     }
 
-    fun getGaiaXRouteForStartAndEnd(start: RouteLocationDto, end: RouteLocationDto, mode: VehicleType): RoutingResponseDto {
+    fun getGaiaXRouteForStartAndEnd(start: RouteLocationDto, end: RouteLocationDto, mode: VehicleType): List<RoutingFeatureDto> {
         val response = this.getRouteForStartEnd(start, end, mode)
         val routingResponseKafka = response.toGaiaxRoutingResponseDto()
-        return routingResponseKafka
+        return routingResponseKafka.features
     }
 
     fun handleRouteRequestAndSendResponse(routingRequestDto: RoutingRequestDto?) {
