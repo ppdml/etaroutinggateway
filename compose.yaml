@@ -1,6 +1,60 @@
 services:
+  connector:
+    image: 1947574/edc:kafka-extension
+    ports:
+      - 127.0.0.1:19191:19191
+      - 127.0.0.1:19192:19192
+      - 127.0.0.1:19193:19193
+      - 127.0.0.1:19194:19194
+      - 127.0.0.1:19291:19291
+    networks:
+      - gaiax
+    depends_on:
+      - gateway
+    environment:
+      EDC_IDS_ID: urn:connector:provider
+      EDC_PARTICIPANT_ID: provider
+      EDC_DSP_CALLBACK_ADDRESS: http://connector.gaiax.tsachweh.de/protocol
+      WEB_HTTP_PORT: 19191
+      WEB_HTTP_PATH: /api
+      WEB_HTTP_MANAGEMENT_PORT: 19193
+      WEB_HTTP_MANAGEMENT_PATH: /management
+      WEB_HTTP_PROTOCOL_PORT: 19194
+      WEB_HTTP_PROTOCOL_PATH: /protocol
+      WEB_HTTP_PUBLIC_PORT: 19291
+      WEB_HTTP_PUBLIC_PATH: /public
+      WEB_HTTP_CONTROL_PORT: 19192
+      WEB_HTTP_CONTROL_PATH: /control
+      EDC_DATAPLANE_TOKEN_VALIDATION_ENDPOINT: http://connector.gaiax.tsachweh.de/control/token
+
+  gateway:
+    image: 1947574/etaroutinggateway:latest
+    depends_on:
+      - kafka
+      - routing-service
+    networks:
+      - gaiax
+    environment:
+      REQUEST_TOPIC: eta-routing-request
+      RESPONSE_TOPIC: eta-routing-response
+      ROUTING_SERVER_ADDRESS: http://routing-service:8080/
+      KAFKA_SERVER: kafka:9092
+
+  routing-service:
+    image: 1947574/otp-routing-service:2.5.0
+    #ports:
+    #  - 8081:8080
+    volumes:
+      - ../../../datasets/otp-niedersachsen:/graph
+    networks:
+      - gaiax
+    entrypoint: java
+    command: "-Xmx2G -jar /app/application.jar --load /graph/"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    networks:
+      - gaiax
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -11,8 +65,10 @@ services:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
-    ports:
-      - 29092:29092
+    #ports:
+    #  - 29092:29092
+    networks:
+      - gaiax
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -20,3 +76,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+networks:
+  gaiax:
+    driver: bridge
