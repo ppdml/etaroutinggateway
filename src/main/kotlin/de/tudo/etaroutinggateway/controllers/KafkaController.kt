@@ -13,7 +13,11 @@ class KafkaController(
     @Autowired
     private val otpRouteMappingService: OtpRouteMappingService
 ) {
-    @KafkaListener(topics = ["\${gaiax.kafka.request-topic}"], groupId = "routing-gateway-listener", containerFactory = "routingRequestListener")
+    @KafkaListener(
+        topics = ["\${gaiax.kafka.request-topic}"],
+        groupId = "routing-gateway-listener",
+        containerFactory = "routingRequestListener"
+    )
     fun listenRoutingRequest(consumerRecord: ConsumerRecord<String, RoutingRequestDto>) {
         otpRouteMappingService.handleRouteRequestAndSendResponse(consumerRecord.value())
     }

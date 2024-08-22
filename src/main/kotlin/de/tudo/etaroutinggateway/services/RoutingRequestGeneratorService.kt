@@ -20,7 +20,7 @@ class RoutingRequestGeneratorService(
     fun generateRoutingRequest(numLocations: Int = 3,
                                vehicleType: VehicleType = VehicleType.CAR): RoutingRequestDto {
         return RoutingRequestDto(
-            requestId = UUID.randomUUID(),
+            requestId = UUID.randomUUID().toString(),
             routeLocations = (0..numLocations).map {
                 RouteLocationDto(
                     latitude = 52.45936 + Math.random() * (53.36039-52.45936), //49.434114 + Math.random() * (52.866945-49.434114),//51.1642292,

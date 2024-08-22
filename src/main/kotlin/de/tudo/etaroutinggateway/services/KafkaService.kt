@@ -22,7 +22,8 @@ class KafkaService(
         kafkaRequestTemplate.send(requestTopic, routingRequest)
     }
 
-    fun sendRoutingResponse(routingResponse: RoutingResponseDto) {
+    fun sendRoutingResponse(routingResponse: RoutingResponseDto, routingRequestId: String) {
+        routingResponse.requestId = routingRequestId
         kafkaResponseTemplate.send(responseTopic, routingResponse)
     }
 }

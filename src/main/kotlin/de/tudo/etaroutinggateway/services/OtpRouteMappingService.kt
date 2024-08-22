@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.getForObject
 
 @Service
 class OtpRouteMappingService(
@@ -28,7 +27,7 @@ class OtpRouteMappingService(
                 routingRequest.routeLocations[i + 1],
                 routingRequest.metadata.vehicleType))
         }
-        return RoutingResponseDto(features = responses)
+        return RoutingResponseDto(features = responses,)
     }
 
     fun getGaiaXRouteForStartAndEnd(start: RouteLocationDto, end: RouteLocationDto, mode: VehicleType): List<RoutingFeatureDto> {
@@ -38,7 +37,9 @@ class OtpRouteMappingService(
     }
 
     fun handleRouteRequestAndSendResponse(routingRequestDto: RoutingRequestDto?) {
-        kafkaService.sendRoutingResponse(getRouteForRequest(routingRequestDto!!))
+        kafkaService.sendRoutingResponse(getRouteForRequest(routingRequestDto!!),
+            routingRequestDto.requestId.toString()
+        )
     }
 
     fun getRouteForStartEnd(start: RouteLocationDto, end: RouteLocationDto, mode: VehicleType): OtpResponseDto {
