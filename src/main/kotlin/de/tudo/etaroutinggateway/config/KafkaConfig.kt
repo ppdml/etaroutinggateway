@@ -13,8 +13,11 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.annotation.EnableKafka
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.*
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer
+import org.springframework.kafka.listener.DefaultErrorHandler
 import org.springframework.kafka.support.serializer.JsonDeserializer
 import org.springframework.kafka.support.serializer.JsonSerializer
+import org.springframework.util.backoff.FixedBackOff
 
 
 @Configuration
@@ -34,23 +37,31 @@ class KafkaConfig(
     }
 
     @Bean
-    fun routingRequestDtoKafkaConsumerFactory(): ConsumerFactory<String, RoutingRequestDto> {
-        val payloadJsonDeserializer: JsonDeserializer<RoutingRequestDto> = JsonDeserializer<RoutingRequestDto>()
+    fun routingRequestDtoKafkaConsumerFactory(): ConsumerFactory<String, String> {
+        /*val payloadJsonDeserializer: JsonDeserializer<RoutingRequestDto> = JsonDeserializer<RoutingRequestDto>()
         payloadJsonDeserializer.addTrustedPackages(
             "de.tudo.etaroutinggateway.entities.dtos",
             "de.tudo.etaroutinggateway.entities.dtos.gaiax",
             "de.tudo.etaroutinggateway.entities.dtos.otp"
-        )
-        return DefaultKafkaConsumerFactory(jsonConsumerConfigs(), StringDeserializer(), payloadJsonDeserializer)
+        )*/
+        return DefaultKafkaConsumerFactory(jsonConsumerConfigs(), StringDeserializer(), StringDeserializer())
     }
 
     @Bean
-    fun routingRequestListener(): ConcurrentKafkaListenerContainerFactory<String, RoutingRequestDto> {
+    fun routingRequestListener(): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory
-                : ConcurrentKafkaListenerContainerFactory<String, RoutingRequestDto> =
-            ConcurrentKafkaListenerContainerFactory<String, RoutingRequestDto>()
+                : ConcurrentKafkaListenerContainerFactory<String, String> =
+            ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.consumerFactory = routingRequestDtoKafkaConsumerFactory()
+        factory.setCommonErrorHandler(retryErrorHandler())
         return factory
+    }
+
+    // This is a blocking retry (will move offset only when all tries are completed) error handler configured with
+    // DeadLetterPublishingRecoverer which publishes event to DLT when tries are over
+    fun retryErrorHandler(): DefaultErrorHandler {
+        val recoverer: DeadLetterPublishingRecoverer = DeadLetterPublishingRecoverer(routingRequestKafkaTemplate())
+        return DefaultErrorHandler(recoverer, FixedBackOff(1000, 3))
     }
 
     @Bean
@@ -85,7 +96,7 @@ class KafkaConfig(
         val configProps: MutableMap<String, Any> = HashMap()
         configProps[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = servers
         configProps[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
-        configProps[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java
+        configProps[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
         return configProps
     }
 }
