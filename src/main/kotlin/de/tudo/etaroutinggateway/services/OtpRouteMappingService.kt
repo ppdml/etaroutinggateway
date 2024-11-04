@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class OtpRouteMappingService(
@@ -49,15 +51,15 @@ class OtpRouteMappingService(
         }
         if (routingResponseKafka.features.isEmpty() ||
             routingResponseKafka.features[0].geometry.coordinates.isEmpty() ||
-            (52.310731857708134 < start.latitude &&  start.latitude < 52.317208653922705 &&
-             8.003401925933604 < start.longitude && start.longitude < 8.012513791827066)
+            (52.310731857708134 < start.latitude && start.latitude < 52.317208653922705 &&
+                    8.003401925933604 < start.longitude && start.longitude < 8.012513791827066)
         ) {
             updatedList = listOf(listOf(start.longitude, start.latitude)) + updatedList
         }
 
         if (routingResponseKafka.features.isEmpty() ||
             routingResponseKafka.features[0].geometry.coordinates.isEmpty() ||
-            (52.310731857708134 < end.latitude &&  end.latitude < 52.317208653922705 &&
+            (52.310731857708134 < end.latitude && end.latitude < 52.317208653922705 &&
                     8.003401925933604 < end.longitude && end.longitude < 8.012513791827066)
         ) {
             updatedList = updatedList + listOf(listOf(end.longitude, end.latitude))
@@ -83,8 +85,15 @@ class OtpRouteMappingService(
     }
 
     fun getRouteForStartEnd(start: RouteLocationDto, end: RouteLocationDto, mode: VehicleType): OtpResponseDto {
+        val current = LocalDateTime.now()
+        val timeFormat = DateTimeFormatter.ofPattern("h:mma")
+        val dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy")
         val requestUrl = "/otp/routers/default/plan?fromPlace=${start.latitude},${start.longitude}" +
-                "&toPlace=${end.latitude},${end.longitude}&time=4:12pm&date=01-23-2024&mode=CAR&arriveBy=false" +
+                "&toPlace=${end.latitude},${end.longitude}&time=${current.format(timeFormat)}&date=${
+                    current.format(
+                        dateFormat
+                    )
+                }&mode=${mode.type}&arriveBy=false" +
                 "&wheelchair=false&showIntermediateStops=true&locale=en"
         val routingResponse: OtpResponseDto =
             restTemplate.getForObject(otpServerAddress + requestUrl, OtpResponseDto::class.java)
