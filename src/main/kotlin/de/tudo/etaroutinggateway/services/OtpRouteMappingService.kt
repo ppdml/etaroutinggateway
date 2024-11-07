@@ -23,7 +23,7 @@ class OtpRouteMappingService(
 
     fun getRouteForRequest(routingRequest: RoutingRequestDto): RoutingResponseDto {
         if (routingRequest.routeLocations.size < 2) throw Exception("Two locations are required for routing")
-        var responses = ArrayList<RoutingFeatureDto>()
+        val responses = ArrayList<RoutingFeatureDto>()
         for (i in 0..routingRequest.routeLocations.size - 2) {
             responses.addAll(
                 this.getGaiaXRouteForStartAndEnd(
@@ -33,8 +33,10 @@ class OtpRouteMappingService(
                 )
             )
         }
-
-        return RoutingResponseDto(features = responses)
+        val routingResponseDto = RoutingResponseDto(features = responses)
+        RouteCachingService.getInstance().addRequest(routingRequest)
+        RouteCachingService.getInstance().addResponse(routingResponseDto)
+        return routingResponseDto
     }
 
     fun getGaiaXRouteForStartAndEnd(
